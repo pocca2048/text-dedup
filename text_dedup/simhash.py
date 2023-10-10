@@ -67,7 +67,13 @@ def _hamming_distance(a: bitarray, b: bitarray) -> int:
 
 
 class Permutation:
-    def __init__(self, f: int, k: int, b: int, masks: List[Tuple[bitarray, int, int, int]]) -> None:
+    def __init__(
+        self,
+        f: int,
+        k: int,
+        b: int,
+        masks: List[Tuple[bitarray, int, int, int]],
+    ) -> None:
         """
         A permutation object for bit manipulation.
 
@@ -367,6 +373,11 @@ if __name__ == "__main__":
                     num_proc=os.cpu_count(),
                     token=args.use_auth_token,
                 )
+                if args.concat_columns:
+                    ds = ds.map(
+                        lambda x: {args.column: " ".join([x[c] for c in args.concat_columns])},
+                        num_proc=os.cpu_count(),
+                    )
 
         LEN_DATASET = len(ds)  # type: ignore
 
@@ -396,10 +407,17 @@ if __name__ == "__main__":
             ):
                 # Iterate over each batch dataset from the total hash embedded dataset
                 embedded_shard = embedded.shard(
-                    num_shards=NUM_SHARDS, index=batch_idx, contiguous=True, writer_batch_size=args.batch_size
+                    num_shards=NUM_SHARDS,
+                    index=batch_idx,
+                    contiguous=True,
+                    writer_batch_size=args.batch_size,
                 )
                 for idx, keys, sig in tqdm(
-                    zip(embedded_shard["__id__"], embedded_shard["__keys__"], embedded_shard["__signature__"]),
+                    zip(
+                        embedded_shard["__id__"],
+                        embedded_shard["__keys__"],
+                        embedded_shard["__signature__"],
+                    ),
                     desc="Indexing...",
                     leave=False,
                     total=len(embedded_shard),

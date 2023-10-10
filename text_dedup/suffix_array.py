@@ -312,6 +312,11 @@ if __name__ == "__main__":
                 cache_dir=args.cache_dir,
                 token=args.use_auth_token,
             )
+            if args.concat_columns:
+                ds = ds.map(
+                    lambda x: {args.column: " ".join([x[c] for c in args.concat_columns])},
+                    num_proc=os.cpu_count(),
+                )
 
         with timer("Preprocessing"):
             offsets: List[slice] = []

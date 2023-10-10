@@ -5,7 +5,9 @@
 import argparse
 
 
-def add_io_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_io_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add input/output arguments to parser.
 
@@ -24,23 +26,48 @@ def add_io_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # 
     parser.add_argument("--data_dir", type=str, help="`data_dir` in load_dataset"),
     parser.add_argument("--data_files", type=str, help="`data_files` in load_dataset"),
     parser.add_argument("--split", type=str, help="`split` in load_dataset"),
-    parser.add_argument("--cache_dir", type=str, help="`cache_dir` in load_dataset", default=".cache"),
+    parser.add_argument(
+        "--cache_dir",
+        type=str,
+        help="`cache_dir` in load_dataset",
+        default=".cache",
+    ),
     parser.add_argument("--revision", type=str, help="`revision` in load_dataset"),
     parser.add_argument(
-        "--use_auth_token", action=argparse.BooleanOptionalAction, help="To use auth token in load_dataset from HF Hub"
+        "--use_auth_token",
+        action=argparse.BooleanOptionalAction,
+        help="To use auth token in load_dataset from HF Hub",
     ),
-    parser.add_argument("--local", action=argparse.BooleanOptionalAction, help="Use local dataset", default=False),
-    parser.add_argument("--output", type=str, help="Path to deduplicated dataset output", required=True),
     parser.add_argument(
-        "--debug", action=argparse.BooleanOptionalAction, help="Whether to run in debug mode", default=False
+        "--local",
+        action=argparse.BooleanOptionalAction,
+        help="Use local dataset",
+        default=False,
+    ),
+    parser.add_argument(
+        "--output",
+        type=str,
+        help="Path to deduplicated dataset output",
+        required=True,
+    ),
+    parser.add_argument(
+        "--debug",
+        action=argparse.BooleanOptionalAction,
+        help="Whether to run in debug mode",
+        default=False,
     )
     parser.add_argument(
-        "--clean_cache", action=argparse.BooleanOptionalAction, help="Whether to remove all cache files", default=True
+        "--clean_cache",
+        action=argparse.BooleanOptionalAction,
+        help="Whether to remove all cache files",
+        default=True,
     )
     return parser
 
 
-def add_meta_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_meta_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add meta arguments to parser.
 
@@ -61,6 +88,13 @@ def add_meta_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  
         required=True,
     ),
     parser.add_argument(
+        "--concat-columns",
+        type=str,
+        nargs="+",
+        help="""Text column to use for deduplication. Concatenate desired columns beforehand if needed.""",
+        required=False,
+    ),
+    parser.add_argument(
         "--batch_size",
         type=int,
         help="""Batch size to use for dataset iteration. Mainly for memory efficiency.
@@ -71,7 +105,9 @@ def add_meta_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  
     return parser
 
 
-def add_minhash_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_minhash_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add MinHash arguments to parser.
 
@@ -98,9 +134,17 @@ def add_minhash_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser
         help="Minimum number of tokens to use in MinHash. Shorter documents will be filtered out.",
     )
     parser.add_argument("--seed", type=int, default=42, help="Seed to use in MinHash")
-    parser.add_argument("--num_perm", type=int, default=256, help="Number of permutations to use in MinHash")
     parser.add_argument(
-        "--threshold", type=float, default=0.7, help="Jaccard similarity threshold to use in MinHashLSH"
+        "--num_perm",
+        type=int,
+        default=256,
+        help="Number of permutations to use in MinHash",
+    )
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=0.7,
+        help="Jaccard similarity threshold to use in MinHashLSH",
     )
     parser.add_argument(
         "--b",
@@ -135,7 +179,9 @@ def add_minhash_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser
     return parser
 
 
-def add_simhash_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_simhash_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add SimHash arguments to parser.
 
@@ -156,15 +202,25 @@ def add_simhash_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser
         help="""Ngram size to use in SimHash.""",
     )
     parser.add_argument("--f", type=int, default=64, choices=[64, 128], help="Simhash bit size"),
-    parser.add_argument("--bit_diff", type=int, default=3, help="Bit difference to use in SimHash"),
     parser.add_argument(
-        "--num_bucket", type=int, default=4, help="Number of buckets to use in SimHash, must be larger than bit_diff"
+        "--bit_diff",
+        type=int,
+        default=3,
+        help="Bit difference to use in SimHash",
+    ),
+    parser.add_argument(
+        "--num_bucket",
+        type=int,
+        default=4,
+        help="Number of buckets to use in SimHash, must be larger than bit_diff",
     ),
 
     return parser
 
 
-def add_sa_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_sa_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add Suffix Array arguments to parser. This adds the following arguments:
 
@@ -185,7 +241,10 @@ def add_sa_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # 
         Parser with added arguments.
     """
     parser.add_argument(
-        "--k", type=int, default=100, help="Minimum byte length of a duplicate substring in Suffix Array Deduplication"
+        "--k",
+        type=int,
+        default=100,
+        help="Minimum byte length of a duplicate substring in Suffix Array Deduplication",
     ),
     parser.add_argument(
         "--strategy",
@@ -195,12 +254,17 @@ def add_sa_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # 
         choices=["overlapping", "longest"],
     )
     parser.add_argument(
-        "--google_repo_path", type=str, help="Path to google-research-deduplication codebase", required=True
+        "--google_repo_path",
+        type=str,
+        help="Path to google-research-deduplication codebase",
+        required=True,
     ),
     return parser
 
 
-def add_bloom_filter_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_bloom_filter_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add Bloom Filter arguments to parser.
 
@@ -214,7 +278,12 @@ def add_bloom_filter_args(parser: argparse.ArgumentParser) -> argparse.ArgumentP
     parser : argparse.ArgumentParser
         Parser with added arguments.
     """
-    parser.add_argument("--error_rate", type=float, default=1e-6, help="Error rate to use in BloomFilter"),
+    parser.add_argument(
+        "--error_rate",
+        type=float,
+        default=1e-6,
+        help="Error rate to use in BloomFilter",
+    ),
     parser.add_argument(
         "--hash_func",
         type=str,
@@ -222,11 +291,18 @@ def add_bloom_filter_args(parser: argparse.ArgumentParser) -> argparse.ArgumentP
         default="md5",
         help="Hash function to use in BloomFilter",
     ),
-    parser.add_argument("--initial_capacity", type=int, default=100, help="Initial capacity of BloomFilter"),
+    parser.add_argument(
+        "--initial_capacity",
+        type=int,
+        default=100,
+        help="Initial capacity of BloomFilter",
+    ),
     return parser
 
 
-def add_exact_hash_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:  # pragma: no cover
+def add_exact_hash_args(
+    parser: argparse.ArgumentParser,
+) -> argparse.ArgumentParser:  # pragma: no cover
     """
     Add Exact Hash arguments to parser.
 

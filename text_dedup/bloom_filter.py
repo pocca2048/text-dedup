@@ -48,6 +48,11 @@ if __name__ == "__main__":  # pragma: no cover
                 token=args.use_auth_token,
                 num_proc=os.cpu_count(),
             )
+            if args.concat_columns:
+                ds = ds.map(
+                    lambda x: {args.column: " ".join([x[c] for c in args.concat_columns])},
+                    num_proc=os.cpu_count(),
+                )
 
         hash_func: Callable = {
             "md5": md5_digest,  # type: ignore

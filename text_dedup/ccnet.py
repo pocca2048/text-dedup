@@ -117,6 +117,11 @@ if __name__ == "__main__":  # pragma: no cover
                 token=args.use_auth_token,
                 num_proc=os.cpu_count(),
             )
+            if args.concat_columns:
+                ds = ds.map(
+                    lambda x: {args.column: " ".join([x[c] for c in args.concat_columns])},
+                    num_proc=os.cpu_count(),
+                )
 
         def md5_digest_sized(data: bytes) -> bytes:
             return md5_digest(data)[:HASH_SIZE]
@@ -154,7 +159,11 @@ if __name__ == "__main__":  # pragma: no cover
             for batch_idx in tqdm(range(0, NUM_SHARDS), desc="Processing..."):
                 ds_shard = hashed.shard(NUM_SHARDS, batch_idx, contiguous=True)
                 for h, id_, idx in tqdm(
-                    zip(ds_shard["__hash__"], ds_shard["__id__"], ds_shard["__idx__"]),
+                    zip(
+                        ds_shard["__hash__"],
+                        ds_shard["__id__"],
+                        ds_shard["__idx__"],
+                    ),
                     leave=False,
                 ):
                     if h in hashes:
@@ -171,7 +180,11 @@ if __name__ == "__main__":  # pragma: no cover
                 fn_kwargs={"column": args.column, "lookup": remove},
                 desc="Deduping",
             )
-            ds = ds.filter(lambda x: len(x[args.column]) > 0, num_proc=os.cpu_count(), desc="Filtering 0 length docs")
+            ds = ds.filter(
+                lambda x: len(x[args.column]) > 0,
+                num_proc=os.cpu_count(),
+                desc="Filtering 0 length docs",
+            )
 
         with timer("Saving"):
             ds.save_to_disk(args.output)

@@ -183,7 +183,12 @@ if __name__ == "__main__":  # pragma: no cover
         # The following assumes a "perfect hash". using 16 bit hashes might challenge this assumption
         # lower precision dtype will cause more collisions, so higher false_positives and less false negatives.
         # Both effects move the result towards more documents being considered duplicates.
-        B, R = optimal_param(args.threshold, args.num_perm, false_positive_weight=0.5, false_negative_weight=0.5)
+        B, R = optimal_param(
+            args.threshold,
+            args.num_perm,
+            false_positive_weight=0.5,
+            false_negative_weight=0.5,
+        )
 
     HASH_RANGES = [(i * R, (i + 1) * R) for i in range(B)]
     HASH_TABLES: List[Dict[int, Set]] = [defaultdict(set) for _ in range(B)]
@@ -204,6 +209,11 @@ if __name__ == "__main__":  # pragma: no cover
                     num_proc=os.cpu_count(),
                     token=args.use_auth_token,
                 )
+                if args.concat_columns:
+                    ds = ds.map(
+                        lambda x: {args.column: " ".join([x[c] for c in args.concat_columns])},
+                        num_proc=os.cpu_count(),
+                    )
 
         LEN_DATASET = len(ds)
         # for minhash, we need to make a lot of hashes(=num_perms).
@@ -247,7 +257,10 @@ if __name__ == "__main__":  # pragma: no cover
                 desc="Iterating MinHashes...",  # noqa: E501
             ):
                 embedded_shard = embedded.shard(
-                    num_shards=NUM_SHARDS, index=i, contiguous=True, writer_batch_size=args.batch_size
+                    num_shards=NUM_SHARDS,
+                    index=i,
+                    contiguous=True,
+                    writer_batch_size=args.batch_size,
                 )
                 for key, Hs in zip(embedded_shard["__id__"], embedded_shard["__signatures__"]):
                     for i, H in enumerate(Hs):

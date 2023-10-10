@@ -47,6 +47,11 @@ if __name__ == "__main__":  # pragma: no cover
                 num_proc=NUM_PROC,
                 token=args.use_auth_token,
             )
+            if args.concat_columns:
+                ds = ds.map(
+                    lambda x: {args.column: " ".join([x[c] for c in args.concat_columns])},
+                    num_proc=NUM_PROC,
+                )
 
         # we use the hex digests for md5 and sha256 for legacy compatibility reasons
         # we use the raw xxh3_128 byte digests for speed
